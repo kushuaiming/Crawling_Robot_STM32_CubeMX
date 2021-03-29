@@ -100,8 +100,8 @@ int main(void)
   /* USER CODE BEGIN 2 */
   HAL_UART_Receive_IT(&huart1, &single_buffer, 1);// 串口接收数据
   __HAL_UART_ENABLE_IT(&huart1, UART_IT_IDLE);    // 开启串口空闲中断
-  pid_parameter_init(&motor_pid[0], 0x01, htim2);
-  pid_parameter_init(&motor_pid[1], 0x02, htim3);
+  pid_parameter_init(&motor_pid[0], 0x07, htim2);
+  pid_parameter_init(&motor_pid[1], 0x08, htim3);
   
   HAL_TIM_Base_Start_IT(&htim4); // 启动电机PID控制定时器
   HAL_TIM_Base_Start_IT(&htim5); // 启动电机PID控制定时器
@@ -114,7 +114,7 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-
+    HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_2);
     /* USER CODE BEGIN 3 */
     HAL_Delay(500);
   }

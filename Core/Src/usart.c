@@ -230,6 +230,7 @@ void UART_IDLECallBack(UART_HandleTypeDef *huart)
     {
         current_buffer_length = 0;
         protocol_handle();
+        HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_3);
         __HAL_UART_CLEAR_IDLEFLAG(&huart1); // 清除空闲中断标志(否则会一直不断进入中断)
     }
 }
@@ -250,10 +251,10 @@ void protocol_handle(void)
     {
         case 0x01: // 控制灯改变亮灭状态
         {
-            if (read_buffer[2] == 0x01)
-                HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_2);
-            if (read_buffer[3] == 0x01)
-                HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_3);
+//            if (read_buffer[2] == 0x01)
+//                HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_2);
+//            if (read_buffer[3] == 0x01)
+//                HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_3);
             if (read_buffer[4] == 0x01)
                 HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_4);
             if (read_buffer[5] == 0x01)
