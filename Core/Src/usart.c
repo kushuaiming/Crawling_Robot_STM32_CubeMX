@@ -232,6 +232,12 @@ void UART_IDLECallBack(UART_HandleTypeDef *huart)
         protocol_handle();
         __HAL_UART_CLEAR_IDLEFLAG(&huart1); // 清除空闲中断标志(否则会一直不断进入中断)
     }
+    
+    // 防止数据溢出导致错误
+    if(__HAL_UART_GET_FLAG(&(huart1), UART_FLAG_ORE) != RESET)
+    {
+        __HAL_UART_CLEAR_OREFLAG(&(huart1));
+    }
 }
 
 /**
