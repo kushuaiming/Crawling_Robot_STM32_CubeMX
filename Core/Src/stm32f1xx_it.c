@@ -263,6 +263,12 @@ void USART1_IRQHandler(void)
     UART_IDLECallBack(&huart1);
   }
   
+      // 防止数据溢出导致错误
+    if(__HAL_UART_GET_FLAG(&(huart1), UART_FLAG_ORE) != RESET)
+    {
+        __HAL_UART_CLEAR_OREFLAG(&(huart1));
+    }
+  
   /* USER CODE END USART1_IRQn 1 */
 }
 

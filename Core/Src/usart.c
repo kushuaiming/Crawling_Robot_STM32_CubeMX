@@ -232,12 +232,6 @@ void UART_IDLECallBack(UART_HandleTypeDef *huart)
         protocol_handle();
         __HAL_UART_CLEAR_IDLEFLAG(&huart1); // 清除空闲中断标志(否则会一直不断进入中断)
     }
-    
-    // 防止数据溢出导致错误
-    if(__HAL_UART_GET_FLAG(&(huart1), UART_FLAG_ORE) != RESET)
-    {
-        __HAL_UART_CLEAR_OREFLAG(&(huart1));
-    }
 }
 
 /**
@@ -248,10 +242,10 @@ extern pid_parameter motor_pid[2];
 void protocol_handle(void)
 {
     // CRC校验
-    uint8_t low_value = 0x00, high_value = 0x00;
-    CRC16_MODBUS(read_buffer, 6, &low_value, &high_value);
-    if (read_buffer[6] != low_value || read_buffer[7] != high_value)
-        return;
+//    uint8_t low_value = 0x00, high_value = 0x00;
+//    CRC16_MODBUS(read_buffer, 6, &low_value, &high_value);
+//    if (read_buffer[6] != low_value || read_buffer[7] != high_value)
+//        return;
     switch (read_buffer[1])
     {
         case 0x01: // 控制灯改变亮灭状态
@@ -264,7 +258,7 @@ void protocol_handle(void)
                 HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_4);
             if (read_buffer[5] == 0x01)
                 HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_5);
-            printf("LED complete.");
+            //printf("LED complete.");
             break;
         }
         case 0x02: // 电机控制
@@ -272,7 +266,7 @@ void protocol_handle(void)
             int32_t pwm_value = 0;
             memcpy(&pwm_value, read_buffer + 2, sizeof(int32_t));
 
-            printf("pwm_value: %d, motor id: %d\r\n", pwm_value, read_buffer[0]);
+            //printf("pwm_value: %d, motor id: %d\r\n", pwm_value, read_buffer[0]);
             motor_drive_instruct(read_buffer[0], pwm_value);
             break;
         }
