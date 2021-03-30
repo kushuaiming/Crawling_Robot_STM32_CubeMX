@@ -26,7 +26,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "motor_control.h"
-#include "electromagnetic_valve_control.h"
+#include "pneumatic_control.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -114,7 +114,7 @@ int main(void)
   // ≥ı ºªØµÁ¥≈∑ß
   close_electromagnetic_valve(GPIO_PIN_All);
   valve_init(&valve[0], 0x09, GPIO_PIN_0);
-  valve_init(&valve[1], 0x0a, GPIO_PIN_1);
+  valve_init(&valve[1], 0x0a, GPIO_PIN_4);
   
   /* USER CODE END 2 */
 

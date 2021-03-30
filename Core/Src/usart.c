@@ -269,7 +269,7 @@ void protocol_handle(void)
             memcpy(&pwm_value, read_buffer + 2, sizeof(int32_t));
 
             //printf("pwm_value: %d, motor id: %d\r\n", pwm_value, read_buffer[0]);
-            motor_drive_instruct(read_buffer[0], pwm_value);
+            //motor_drive_instruct(read_buffer[0], pwm_value);
             break;
         }
         case 0x03: // 将当前位置设置为新的零点
@@ -277,8 +277,8 @@ void protocol_handle(void)
             if(read_buffer[0] == motor_pid[0].motor_id)
             {
                 pid_parameter_init(&motor_pid[0], motor_pid[0].motor_id, htim2);
-                uint8_t return_data[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-                HAL_UART_Transmit(&huart1, return_data, sizeof(return_data), 500);
+                //uint8_t return_data[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+                //HAL_UART_Transmit(&huart1, return_data, sizeof(return_data), 500);
                 //printf("pos_set[%02X]: %f, pos_curr[%02X]: %f\r\n", motor_pid[0].motor_id, motor_pid[0].pos_set,
                 //                                                    motor_pid[0].motor_id, motor_pid[0].pos_curr);
             }
@@ -317,18 +317,19 @@ void protocol_handle(void)
         {
             if(read_buffer[0] == motor_pid[0].motor_id)
             {
-                uint8_t return_data[8] = {0x00, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+                uint8_t return_data[8] = {0x00, 0x09, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
                 return_data[0] = motor_pid[0].motor_id;
                 memcpy(return_data + 2, &motor_pid[0].pos_curr, 4);
                 HAL_UART_Transmit(&huart1, return_data, sizeof(return_data), 500);
             }
             else if(read_buffer[0] == motor_pid[1].motor_id)
             {
-                uint8_t return_data[8] = {0x00, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+                uint8_t return_data[8] = {0x00, 0x09, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
                 return_data[0] = motor_pid[1].motor_id;
                 memcpy(return_data + 2, &motor_pid[1].pos_curr, 4);
                 HAL_UART_Transmit(&huart1, return_data, sizeof(return_data), 500);
             }
+            break;
         }
         case 0x06: // 控制电磁阀和真空发生器
         {
@@ -336,13 +337,34 @@ void protocol_handle(void)
             valve_instruct = (valve_instruct << 8) | read_buffer[3];
             
             if (valve_instruct & (0x01 << (valve[0].valve_id - 1)))
-                open_electromagnetic_valve(valve[0].valve_pin);
-            else close_electromagnetic_valve(valve[0].valve_pin);
+            {
+                if(valve[0].valve_id == 0x09)
+                    open_vacuum_generator(valve[0].valve_id);
+                else open_electromagnetic_valve(valve[0].valve_pin);
+            }
+            else
+            {
+                if(valve[0].valve_id == 0x09)
+                    close_vacuum_generator(valve[0].valve_id);
+                else close_electromagnetic_valve(valve[0].valve_pin);
+            }
             
             if (valve_instruct & (0x01 << (valve[1].valve_id - 1)))
-                open_electromagnetic_valve(valve[1].valve_pin);
-            else close_electromagnetic_valve(valve[1].valve_pin);
+            {
+                if(valve[1].valve_id == 0x0a)
+                    open_vacuum_generator(valve[1].valve_id);
+                else open_electromagnetic_valve(valve[1].valve_pin);
+            }
+            else
+            {
+                if(valve[1].valve_id == 0x0a)
+                    close_vacuum_generator(valve[1].valve_id);
+                else close_electromagnetic_valve(valve[1].valve_pin);
+            }
+            break;
         }
+        default:
+            break;
     }
 }
 

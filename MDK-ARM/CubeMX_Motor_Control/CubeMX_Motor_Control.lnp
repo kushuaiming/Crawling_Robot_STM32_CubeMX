@@ -1,6 +1,5 @@
 --cpu Cortex-M3
 "cubemx_motor_control\startup_stm32f103xe.o"
-"cubemx_motor_control\electromagnetic_valve_control.o"
 "cubemx_motor_control\motor_control.o"
 "cubemx_motor_control\main.o"
 "cubemx_motor_control\gpio.o"
@@ -8,6 +7,7 @@
 "cubemx_motor_control\usart.o"
 "cubemx_motor_control\stm32f1xx_it.o"
 "cubemx_motor_control\stm32f1xx_hal_msp.o"
+"cubemx_motor_control\pnuematic_control.o"
 "cubemx_motor_control\stm32f1xx_hal_gpio_ex.o"
 "cubemx_motor_control\stm32f1xx_hal_tim.o"
 "cubemx_motor_control\stm32f1xx_hal_tim_ex.o"

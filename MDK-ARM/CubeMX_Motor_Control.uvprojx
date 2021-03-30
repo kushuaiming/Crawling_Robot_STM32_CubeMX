@@ -393,11 +393,6 @@
           <GroupName>Application/User/Core</GroupName>
           <Files>
             <File>
-              <FileName>electromagnetic_valve_control.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Core\Src\electromagnetic_valve_control.c</FilePath>
-            </File>
-            <File>
               <FileName>motor_control.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Core\Src\motor_control.c</FilePath>
@@ -482,6 +477,11 @@
               <FileName>stm32f1xx_hal_msp.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Core/Src/stm32f1xx_hal_msp.c</FilePath>
+            </File>
+            <File>
+              <FileName>pnuematic_control.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\pnuematic_control.c</FilePath>
             </File>
           </Files>
         </Group>
