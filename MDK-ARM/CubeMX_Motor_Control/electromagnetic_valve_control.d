@@ -35,5 +35,6 @@ cubemx_motor_control\electromagnetic_valve_control.o: ../Core/Inc/usart.h
 cubemx_motor_control\electromagnetic_valve_control.o: ../Core/Inc/main.h
 cubemx_motor_control\electromagnetic_valve_control.o: D:\keil_v5\ARM\ARMCC\Bin\..\include\string.h
 cubemx_motor_control\electromagnetic_valve_control.o: ../Core/Inc/gpio.h
+cubemx_motor_control\electromagnetic_valve_control.o: ../Core/Inc/electromagnetic_valve_control.h
 cubemx_motor_control\electromagnetic_valve_control.o: ../Core/Inc/tim.h
 cubemx_motor_control\electromagnetic_valve_control.o: D:\keil_v5\ARM\ARMCC\Bin\..\include\math.h

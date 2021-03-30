@@ -32,6 +32,7 @@ extern "C" {
 #include "stdint.h"
 #include <string.h>
 #include "gpio.h"
+#include "electromagnetic_valve_control.h"
 /* USER CODE END Includes */
 
 extern UART_HandleTypeDef huart1;

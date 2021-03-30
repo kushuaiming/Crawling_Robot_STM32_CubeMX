@@ -26,6 +26,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "motor_control.h"
+#include "electromagnetic_valve_control.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -50,6 +51,7 @@ uint8_t single_buffer = 0xFF;
 uint8_t read_buffer[BUFFER_LENGTH + 1];
 
 pid_parameter motor_pid[2];
+valve_parameter valve[2];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -98,15 +100,22 @@ int main(void)
   MX_TIM4_Init();
   MX_TIM5_Init();
   /* USER CODE BEGIN 2 */
+  
   HAL_UART_Receive_IT(&huart1, &single_buffer, 1);// 串口接收数据
   __HAL_UART_ENABLE_IT(&huart1, UART_IT_IDLE);    // 开启串口空闲中断
-  pid_parameter_init(&motor_pid[0], 0x07, htim2);
-  pid_parameter_init(&motor_pid[1], 0x08, htim3);
   
-  HAL_TIM_Base_Start_IT(&htim4); // 启动电机PID控制定时器
-  HAL_TIM_Base_Start_IT(&htim5); // 启动电机PID控制定时器
+  pid_parameter_init(&motor_pid[0], 0x09, htim2);
+  pid_parameter_init(&motor_pid[1], 0x0a, htim3);
+//  HAL_TIM_Base_Start_IT(&htim4); // 启动电机PID控制定时器
+//  HAL_TIM_Base_Start_IT(&htim5); // 启动电机PID控制定时器
   HAL_TIM_Encoder_Start(&htim2, TIM_CHANNEL_ALL); // 启动编码器读数
   HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_ALL); // 启动编码器读数
+  
+  // 初始化电磁阀
+  close_electromagnetic_valve(GPIO_PIN_All);
+  valve_init(&valve[0], 0x09, GPIO_PIN_0);
+  valve_init(&valve[1], 0x0a, GPIO_PIN_1);
+  
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -114,9 +123,18 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-    HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_2);
+
     /* USER CODE BEGIN 3 */
-    HAL_Delay(500);
+    int pwm_value1 = pid_calculate(&motor_pid[0], 0.02f);
+    motor_drive_instruct(motor_pid[0].motor_id, pwm_value1);
+
+    HAL_Delay(10);
+
+    int pwm_value2 = pid_calculate(&motor_pid[1], 0.02f);
+    motor_drive_instruct(motor_pid[1].motor_id, pwm_value2);
+
+    HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_2);
+    HAL_Delay(10);
   }
   /* USER CODE END 3 */
 }

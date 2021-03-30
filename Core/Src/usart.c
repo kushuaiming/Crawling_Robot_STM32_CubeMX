@@ -240,6 +240,7 @@ void UART_IDLECallBack(UART_HandleTypeDef *huart)
   * @return     none
   */
 extern pid_parameter motor_pid[2];
+extern valve_parameter valve[2];
 void protocol_handle(void)
 {
     // CRC校验
@@ -297,20 +298,50 @@ void protocol_handle(void)
             if(read_buffer[0] == motor_pid[0].motor_id)
             {
                 motor_pid[0].pos_set = pos_set;
-                //printf("pos_set[%02X]: %f, pos_curr[%02X]: %f\r\n", motor_pid[0].motor_id, motor_pid[0].pos_set,
-                //                                                    motor_pid[0].motor_id, motor_pid[0].pos_curr);
-                uint8_t return_data[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-                HAL_UART_Transmit(&huart1, return_data, sizeof(return_data), 500);
+//                printf("pos_set[%02X]: %f, pos_curr[%02X]: %f\r\n", motor_pid[0].motor_id, motor_pid[0].pos_set,
+//                                                                    motor_pid[0].motor_id, motor_pid[0].pos_curr);
+//                uint8_t return_data[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+//                HAL_UART_Transmit(&huart1, return_data, sizeof(return_data), 500);
             }
             else if(read_buffer[0] == motor_pid[1].motor_id)
             {
                 motor_pid[1].pos_set = pos_set;
-                //printf("pos_set[%02X]: %f, pos_curr[%02X]: %f\r\n", motor_pid[1].motor_id, motor_pid[1].pos_set,
-                //                                                    motor_pid[1].motor_id, motor_pid[1].pos_curr);
-                uint8_t return_data[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-                HAL_UART_Transmit(&huart1, return_data, sizeof(return_data), 500);
+//                printf("pos_set[%02X]: %f, pos_curr[%02X]: %f\r\n", motor_pid[1].motor_id, motor_pid[1].pos_set,
+//                                                                    motor_pid[1].motor_id, motor_pid[1].pos_curr);
+//                uint8_t return_data[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+//                HAL_UART_Transmit(&huart1, return_data, sizeof(return_data), 500);
             }
             break;
+        }
+        case 0x05: // 返回对应ID的当前位置
+        {
+            if(read_buffer[0] == motor_pid[0].motor_id)
+            {
+                uint8_t return_data[8] = {0x00, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+                return_data[0] = motor_pid[0].motor_id;
+                memcpy(return_data + 2, &motor_pid[0].pos_curr, 4);
+                HAL_UART_Transmit(&huart1, return_data, sizeof(return_data), 500);
+            }
+            else if(read_buffer[0] == motor_pid[1].motor_id)
+            {
+                uint8_t return_data[8] = {0x00, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+                return_data[0] = motor_pid[1].motor_id;
+                memcpy(return_data + 2, &motor_pid[1].pos_curr, 4);
+                HAL_UART_Transmit(&huart1, return_data, sizeof(return_data), 500);
+            }
+        }
+        case 0x06: // 控制电磁阀和真空发生器
+        {
+            uint16_t valve_instruct = read_buffer[2];
+            valve_instruct = (valve_instruct << 8) | read_buffer[3];
+            
+            if (valve_instruct & (0x01 << (valve[0].valve_id - 1)))
+                open_electromagnetic_valve(valve[0].valve_pin);
+            else close_electromagnetic_valve(valve[0].valve_pin);
+            
+            if (valve_instruct & (0x01 << (valve[1].valve_id - 1)))
+                open_electromagnetic_valve(valve[1].valve_pin);
+            else close_electromagnetic_valve(valve[1].valve_pin);
         }
     }
 }

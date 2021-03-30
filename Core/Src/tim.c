@@ -368,25 +368,25 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle)
 }
 
 /* USER CODE BEGIN 1 */
-extern pid_parameter motor_pid[2];
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
-    if(htim == &htim4)
-    {
-      int temp = pid_calculate(&motor_pid[0], 0.02f);
-      //printf("htim4 pwm value:%d\r\n", temp);
-      motor_drive_instruct(motor_pid[0].motor_id, temp);
-    }
+//extern pid_parameter motor_pid[2];
+//void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+//{
+//    if(htim == &htim4)
+//    {
+//      int temp = pid_calculate(&motor_pid[0], 0.02f);
+//      //printf("htim4 pwm value:%d\r\n", temp);
+//      motor_drive_instruct(motor_pid[0].motor_id, temp);
+//    }
 
-    HAL_Delay(5);
+//    HAL_Delay(5);
 
-    if(htim == &htim5)
-    {
-      int temp = pid_calculate(&motor_pid[1], 0.02f);
-      //printf("htim5 pwm value:%d\r\n", temp);
-      motor_drive_instruct(motor_pid[1].motor_id, temp);
-    }
-}
+//    if(htim == &htim5)
+//    {
+//      int temp = pid_calculate(&motor_pid[1], 0.02f);
+//      //printf("htim5 pwm value:%d\r\n", temp);
+//      motor_drive_instruct(motor_pid[1].motor_id, temp);
+//    }
+//}
 /* USER CODE END 1 */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

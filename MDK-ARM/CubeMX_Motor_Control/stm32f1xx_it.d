@@ -34,6 +34,7 @@ cubemx_motor_control\stm32f1xx_it.o: ../Core/Inc/usart.h
 cubemx_motor_control\stm32f1xx_it.o: ../Core/Inc/main.h
 cubemx_motor_control\stm32f1xx_it.o: D:\keil_v5\ARM\ARMCC\Bin\..\include\string.h
 cubemx_motor_control\stm32f1xx_it.o: ../Core/Inc/gpio.h
+cubemx_motor_control\stm32f1xx_it.o: ../Core/Inc/electromagnetic_valve_control.h
 cubemx_motor_control\stm32f1xx_it.o: ../Core/Inc/tim.h
 cubemx_motor_control\stm32f1xx_it.o: D:\keil_v5\ARM\ARMCC\Bin\..\include\math.h
 cubemx_motor_control\stm32f1xx_it.o: ../Core/Inc/stm32f1xx_it.h
