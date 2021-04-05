@@ -338,7 +338,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F103xE</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;                          ../Drivers/STM32F1xx_HAL_Driver/Inc;                          ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;                          ../Drivers/CMSIS/Device/ST/STM32F1xx/Include;                          ../Drivers/CMSIS/Include</IncludePath>
+              <IncludePath>../Core/Inc;                              ../Drivers/STM32F1xx_HAL_Driver/Inc;                              ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;                              ../Drivers/CMSIS/Device/ST/STM32F1xx/Include;                              ../Drivers/CMSIS/Include</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -479,9 +479,9 @@
               <FilePath>../Core/Src/stm32f1xx_hal_msp.c</FilePath>
             </File>
             <File>
-              <FileName>pnuematic_control.c</FileName>
+              <FileName>pneumatic_control.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Core\Src\pnuematic_control.c</FilePath>
+              <FilePath>..\Core\Src\pneumatic_control.c</FilePath>
             </File>
           </Files>
         </Group>

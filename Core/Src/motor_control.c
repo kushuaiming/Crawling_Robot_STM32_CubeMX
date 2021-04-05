@@ -7,7 +7,7 @@ uint8_t data[8];
   * @param[in]  PWM的数值,范围从-1000~1000
   * @return     none
   */
-void motor_drive_instruct(uint8_t motor_id, int32_t pwm_value)
+void motor_drive_instruct(uint8_t motor_id, int16_t pwm_value)
 {
     // 对pwm进行限位
     if (pwm_value > 1000)
@@ -28,6 +28,9 @@ void motor_drive_instruct(uint8_t motor_id, int32_t pwm_value)
     data[5] = pwm_value & 0xFF;
     // data[6]CRC码低字节,data[7]CRC码高字节
     CRC16_MODBUS(data, 6, &data[6], &data[7]);
+    
+    printf("pwm: %d, data[4]:%02X, data[5]:%02X\r\n", pwm_value, data[4], data[5]);
+    
     HAL_UART_Transmit(&huart2, data, sizeof(data), 500);
     //printf("Motor successfully controled.");
 }
@@ -38,7 +41,7 @@ extern pid_parameter motor_pid[2];
   * @param[in]  pid控制变量
   * @return     none
   */
-void pid_parameter_init(pid_parameter* pid, uint8_t id, TIM_HandleTypeDef htim)
+void pid_parameter_init(pid_parameter* pid, uint8_t id, TIM_HandleTypeDef* htim)
 {
     pid->motor_id = id;
     pid->encoder_value = 0;
@@ -57,7 +60,11 @@ void pid_parameter_init(pid_parameter* pid, uint8_t id, TIM_HandleTypeDef htim)
     pid->Ki = 0.1f;
     pid->Kd = 3.7f;
 
-    pid->Ph = 4;
+    // 框架的导程为4,腿部的导程为2
+    if (id == 0x09 || id == 0x0a)
+        pid->Ph = 4;
+    else pid->Ph = 2;
+
     pid->encoder_number_per_circle = 3.0f;
     pid->reduction_ratio = 1 / 181.0f;
 }
@@ -69,8 +76,8 @@ void pid_parameter_init(pid_parameter* pid, uint8_t id, TIM_HandleTypeDef htim)
   */
 int32_t encoder_read(pid_parameter* pid)
 {
-    int16_t encoder = (int16_t)(__HAL_TIM_GET_COUNTER(&(pid->htim)));
-    __HAL_TIM_SET_COUNTER(&(pid->htim),0);
+    int16_t encoder = (int16_t)(__HAL_TIM_GET_COUNTER((pid->htim)));
+    __HAL_TIM_SET_COUNTER((pid->htim),0);
     return encoder;
 }
 

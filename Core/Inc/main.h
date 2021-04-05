@@ -60,6 +60,7 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 /* USER CODE BEGIN Private defines */
 #define BUFFER_LENGTH 8
+#define VALVE_LENGTH 4
 
 extern int current_buffer_length;
 extern uint8_t single_buffer;

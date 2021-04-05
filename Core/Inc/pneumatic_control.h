@@ -8,9 +8,7 @@ typedef struct {
 } valve_parameter;
 
 void valve_init(valve_parameter* valve, uint8_t id, uint16_t pin);
-void open_electromagnetic_valve(uint16_t pin);
-void close_electromagnetic_valve(uint16_t pin);
-void open_vacuum_generator(uint8_t id);
-void close_vacuum_generator(uint8_t id);
+void open_valve(uint16_t pin);
+void close_valve(uint16_t pin);
 
 #endif

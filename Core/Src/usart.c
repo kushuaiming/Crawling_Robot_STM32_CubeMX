@@ -26,6 +26,7 @@
 
 UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
+UART_HandleTypeDef huart3;
 
 /* USART1 init function */
 
@@ -40,7 +41,7 @@ void MX_USART1_UART_Init(void)
 
   /* USER CODE END USART1_Init 1 */
   huart1.Instance = USART1;
-  huart1.Init.BaudRate = 9600;
+  huart1.Init.BaudRate = 115200;
   huart1.Init.WordLength = UART_WORDLENGTH_9B;
   huart1.Init.StopBits = UART_STOPBITS_1;
   huart1.Init.Parity = UART_PARITY_EVEN;
@@ -69,7 +70,7 @@ void MX_USART2_UART_Init(void)
 
   /* USER CODE END USART2_Init 1 */
   huart2.Instance = USART2;
-  huart2.Init.BaudRate = 9600;
+  huart2.Init.BaudRate = 115200;
   huart2.Init.WordLength = UART_WORDLENGTH_9B;
   huart2.Init.StopBits = UART_STOPBITS_1;
   huart2.Init.Parity = UART_PARITY_EVEN;
@@ -83,6 +84,35 @@ void MX_USART2_UART_Init(void)
   /* USER CODE BEGIN USART2_Init 2 */
 
   /* USER CODE END USART2_Init 2 */
+
+}
+/* USART3 init function */
+
+void MX_USART3_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART3_Init 0 */
+
+  /* USER CODE END USART3_Init 0 */
+
+  /* USER CODE BEGIN USART3_Init 1 */
+
+  /* USER CODE END USART3_Init 1 */
+  huart3.Instance = USART3;
+  huart3.Init.BaudRate = 115200;
+  huart3.Init.WordLength = UART_WORDLENGTH_9B;
+  huart3.Init.StopBits = UART_STOPBITS_1;
+  huart3.Init.Parity = UART_PARITY_EVEN;
+  huart3.Init.Mode = UART_MODE_TX_RX;
+  huart3.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart3.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart3) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART3_Init 2 */
+
+  /* USER CODE END USART3_Init 2 */
 
 }
 
@@ -150,6 +180,36 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
 
   /* USER CODE END USART2_MspInit 1 */
   }
+  else if(uartHandle->Instance==USART3)
+  {
+  /* USER CODE BEGIN USART3_MspInit 0 */
+
+  /* USER CODE END USART3_MspInit 0 */
+    /* USART3 clock enable */
+    __HAL_RCC_USART3_CLK_ENABLE();
+
+    __HAL_RCC_GPIOB_CLK_ENABLE();
+    /**USART3 GPIO Configuration
+    PB10     ------> USART3_TX
+    PB11     ------> USART3_RX
+    */
+    GPIO_InitStruct.Pin = GPIO_PIN_10;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+    GPIO_InitStruct.Pin = GPIO_PIN_11;
+    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+    /* USART3 interrupt Init */
+    HAL_NVIC_SetPriority(USART3_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(USART3_IRQn);
+  /* USER CODE BEGIN USART3_MspInit 1 */
+
+  /* USER CODE END USART3_MspInit 1 */
+  }
 }
 
 void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
@@ -194,6 +254,26 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
   /* USER CODE BEGIN USART2_MspDeInit 1 */
 
   /* USER CODE END USART2_MspDeInit 1 */
+  }
+  else if(uartHandle->Instance==USART3)
+  {
+  /* USER CODE BEGIN USART3_MspDeInit 0 */
+
+  /* USER CODE END USART3_MspDeInit 0 */
+    /* Peripheral clock disable */
+    __HAL_RCC_USART3_CLK_DISABLE();
+
+    /**USART3 GPIO Configuration
+    PB10     ------> USART3_TX
+    PB11     ------> USART3_RX
+    */
+    HAL_GPIO_DeInit(GPIOB, GPIO_PIN_10|GPIO_PIN_11);
+
+    /* USART3 interrupt Deinit */
+    HAL_NVIC_DisableIRQ(USART3_IRQn);
+  /* USER CODE BEGIN USART3_MspDeInit 1 */
+
+  /* USER CODE END USART3_MspDeInit 1 */
   }
 }
 
@@ -276,7 +356,7 @@ void protocol_handle(void)
         {
             if(read_buffer[0] == motor_pid[0].motor_id)
             {
-                pid_parameter_init(&motor_pid[0], motor_pid[0].motor_id, htim2);
+                pid_parameter_init(&motor_pid[0], motor_pid[0].motor_id, &htim2);
                 //uint8_t return_data[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
                 //HAL_UART_Transmit(&huart1, return_data, sizeof(return_data), 500);
                 //printf("pos_set[%02X]: %f, pos_curr[%02X]: %f\r\n", motor_pid[0].motor_id, motor_pid[0].pos_set,
@@ -284,7 +364,7 @@ void protocol_handle(void)
             }
             else if(read_buffer[0] == motor_pid[1].motor_id)
             {
-                pid_parameter_init(&motor_pid[1], motor_pid[1].motor_id, htim3);
+                pid_parameter_init(&motor_pid[1], motor_pid[1].motor_id, &htim3);
                 //printf("pos_set[%02X]: %f, pos_curr[%02X]: %f\r\n", motor_pid[1].motor_id, motor_pid[1].pos_set,
                 //                                                    motor_pid[1].motor_id, motor_pid[1].pos_curr);
             }
@@ -333,34 +413,17 @@ void protocol_handle(void)
         }
         case 0x06: // 控制电磁阀和真空发生器
         {
+            // 对应位置为1则打开,对应位置为0则关闭
             uint16_t valve_instruct = read_buffer[2];
             valve_instruct = (valve_instruct << 8) | read_buffer[3];
             
-            if (valve_instruct & (0x01 << (valve[0].valve_id - 1)))
+            for (int i = 0; i < VALVE_LENGTH; i++)
             {
-                if(valve[0].valve_id == 0x09)
-                    open_vacuum_generator(valve[0].valve_id);
-                else open_electromagnetic_valve(valve[0].valve_pin);
-            }
-            else
-            {
-                if(valve[0].valve_id == 0x09)
-                    close_vacuum_generator(valve[0].valve_id);
-                else close_electromagnetic_valve(valve[0].valve_pin);
+                if (valve_instruct & (0x01 << (valve[i].valve_id - 1)))
+                    open_valve(valve[i].valve_pin);
+                else close_valve(valve[i].valve_pin);
             }
             
-            if (valve_instruct & (0x01 << (valve[1].valve_id - 1)))
-            {
-                if(valve[1].valve_id == 0x0a)
-                    open_vacuum_generator(valve[1].valve_id);
-                else open_electromagnetic_valve(valve[1].valve_pin);
-            }
-            else
-            {
-                if(valve[1].valve_id == 0x0a)
-                    close_vacuum_generator(valve[1].valve_id);
-                else close_electromagnetic_valve(valve[1].valve_pin);
-            }
             break;
         }
         default:
@@ -399,7 +462,7 @@ void CRC16_MODBUS(uint8_t input[], int size, uint8_t* low_value, uint8_t* high_v
 int fputc(int ch, FILE *f)
 {
     /* 发送一个字节数据到串口DEBUG_USART */
-    HAL_UART_Transmit(&huart1, (uint8_t *)&ch, 1, 1000);
+    HAL_UART_Transmit(&huart3, (uint8_t *)&ch, 1, 1000);
     return (ch);
 }
 
@@ -407,7 +470,7 @@ int fputc(int ch, FILE *f)
 int fgetc(FILE *f)
 {
     int ch;
-    HAL_UART_Receive(&huart1, (uint8_t *)&ch, 1, 1000);	
+    HAL_UART_Receive(&huart3, (uint8_t *)&ch, 1, 1000);	
     return (ch);
 }
 /* USER CODE END 1 */
