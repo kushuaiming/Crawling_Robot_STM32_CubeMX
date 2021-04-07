@@ -50,8 +50,6 @@ int current_buffer_length = 0;
 uint8_t single_buffer = 0xFF;
 uint8_t read_buffer[BUFFER_LENGTH + 1];
 
-uint32_t count = 0;
-
 pid_parameter motor_pid[2];
 valve_parameter valve[VALVE_LENGTH];
 /* USER CODE END PV */
@@ -116,19 +114,24 @@ int main(void)
   
   // 初始化电磁阀和真空发生器
   close_valve(GPIO_PIN_All);
-  valve_init(&valve[0], 0x09, GPIO_PIN_0);
-  valve_init(&valve[1], 0x0a, GPIO_PIN_4);
-  if (VALVE_LENGTH == 4)
+  if (VALVE_LENGTH == 2) {
+    valve_init(&valve[0], 0x09, GPIO_PIN_0);
+    valve_init(&valve[1], 0x0a, GPIO_PIN_4);
+  } else if (VALVE_LENGTH == 4)
   {
+    // 控制真空发生气抽气(灰色的线)
+    valve_init(&valve[0], 0x09, GPIO_PIN_0);
+    valve_init(&valve[1], 0x0a, GPIO_PIN_2);
     // 控制真空发生器吹气(白色的线)
-    valve_init(&valve[2], 0x0b, GPIO_PIN_1);
-    valve_init(&valve[3], 0x0c, GPIO_PIN_5);
+    valve_init(&valve[VALVE_LENGTH - 2], 0x0b, GPIO_PIN_1);
+    valve_init(&valve[VALVE_LENGTH - 1], 0x0c, GPIO_PIN_3);
   }
   
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  uint32_t count = 0;
   while (1)
   {
     /* USER CODE END WHILE */
@@ -143,8 +146,13 @@ int main(void)
     int16_t pwm_value2 = pid_calculate(&motor_pid[1], 0.02f);
     motor_drive_instruct(motor_pid[1].motor_id, pwm_value2);
 
-    HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_2);
     HAL_Delay(2);
+    
+    if (count == 20)
+    {
+        HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_2);
+        count = 0;
+    }
   }
   /* USER CODE END 3 */
 }
