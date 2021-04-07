@@ -36,6 +36,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -102,30 +103,45 @@ int main(void)
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
   
-  HAL_UART_Receive_IT(&huart1, &single_buffer, 1);// 串口接收数据
-  __HAL_UART_ENABLE_IT(&huart1, UART_IT_IDLE);    // 开启串口空闲中断
-  
-  pid_parameter_init(&motor_pid[0], 0x09, &htim2);
-  pid_parameter_init(&motor_pid[1], 0x0a, &htim3);
-//  HAL_TIM_Base_Start_IT(&htim4); // 启动电机PID控制定时器
-//  HAL_TIM_Base_Start_IT(&htim5); // 启动电机PID控制定时器
-  HAL_TIM_Encoder_Start(&htim2, TIM_CHANNEL_ALL); // 启动编码器读数
-  HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_ALL); // 启动编码器读数
-  
-  // 初始化电磁阀和真空发生器
-  close_valve(GPIO_PIN_All);
-  if (VALVE_LENGTH == 2) {
-    valve_init(&valve[0], 0x09, GPIO_PIN_0);
-    valve_init(&valve[1], 0x0a, GPIO_PIN_4);
-  } else if (VALVE_LENGTH == 4)
-  {
+  //根据单片机的编号来初始化电机和气动元件
+  #if MCU_ID == 0x01
+    pid_parameter_init(&motor_pid[0], 0x01, &htim2);
+    pid_parameter_init(&motor_pid[1], 0x02, &htim3);
+    valve_init(&valve[0], 0x01, GPIO_PIN_0);
+    valve_init(&valve[1], 0x02, GPIO_PIN_1);
+  #elif MCU_ID == 0x02
+    pid_parameter_init(&motor_pid[0], 0x03, &htim2);
+    pid_parameter_init(&motor_pid[1], 0x04, &htim3);
+    valve_init(&valve[0], 0x03, GPIO_PIN_2);
+    valve_init(&valve[1], 0x04, GPIO_PIN_3);
+  #elif MCU_ID == 0x03
+    pid_parameter_init(&motor_pid[0], 0x05, &htim2);
+    pid_parameter_init(&motor_pid[1], 0x06, &htim3);
+    valve_init(&valve[0], 0x05, GPIO_PIN_0);
+    valve_init(&valve[1], 0x06, GPIO_PIN_4);
+  #elif MCU_ID == 0x04
+    pid_parameter_init(&motor_pid[0], 0x07, &htim2);
+    pid_parameter_init(&motor_pid[1], 0x08, &htim3);
+    valve_init(&valve[0], 0x07, GPIO_PIN_0);
+    valve_init(&valve[1], 0x08, GPIO_PIN_4);
+  #elif MCU_ID == 0x05
+    pid_parameter_init(&motor_pid[0], 0x09, &htim2);
+    pid_parameter_init(&motor_pid[1], 0x0a, &htim3);
     // 控制真空发生气抽气(灰色的线)
     valve_init(&valve[0], 0x09, GPIO_PIN_0);
     valve_init(&valve[1], 0x0a, GPIO_PIN_2);
     // 控制真空发生器吹气(白色的线)
-    valve_init(&valve[VALVE_LENGTH - 2], 0x0b, GPIO_PIN_1);
-    valve_init(&valve[VALVE_LENGTH - 1], 0x0c, GPIO_PIN_3);
-  }
+    valve_init(&valve[2], 0x0b, GPIO_PIN_1);
+    valve_init(&valve[3], 0x0c, GPIO_PIN_3);
+  #endif
+  
+  HAL_UART_Receive_IT(&huart1, &single_buffer, 1);// 串口接收数据
+  __HAL_UART_ENABLE_IT(&huart1, UART_IT_IDLE);    // 开启串口空闲中断
+  
+//  HAL_TIM_Base_Start_IT(&htim4); // 启动电机PID控制定时器
+//  HAL_TIM_Base_Start_IT(&htim5); // 启动电机PID控制定时器
+  HAL_TIM_Encoder_Start(&htim2, TIM_CHANNEL_ALL); // 启动编码器读数
+  HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_ALL); // 启动编码器读数
   
   /* USER CODE END 2 */
 
@@ -139,7 +155,6 @@ int main(void)
     /* USER CODE BEGIN 3 */
     int16_t pwm_value1 = pid_calculate(&motor_pid[0], 0.02f);
     motor_drive_instruct(motor_pid[0].motor_id, pwm_value1);
-    
 
     HAL_Delay(2);
 

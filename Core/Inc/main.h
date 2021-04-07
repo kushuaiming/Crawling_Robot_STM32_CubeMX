@@ -59,8 +59,14 @@ void Error_Handler(void);
 
 /* Private defines -----------------------------------------------------------*/
 /* USER CODE BEGIN Private defines */
+#define MCU_ID 0x04
 #define BUFFER_LENGTH 8
+
+#if MCU_ID == 0x05
 #define VALVE_LENGTH 4
+#else
+#define VALVE_LENGTH 2
+#endif
 
 extern int current_buffer_length;
 extern uint8_t single_buffer;

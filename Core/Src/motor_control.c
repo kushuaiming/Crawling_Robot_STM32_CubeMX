@@ -74,7 +74,7 @@ void pid_parameter_init(pid_parameter* pid, uint8_t id, TIM_HandleTypeDef* htim)
   * @param[in]  计时器
   * @return     编码器数值
   */
-int32_t encoder_read(pid_parameter* pid)
+int16_t encoder_read(pid_parameter* pid)
 {
     int16_t encoder = (int16_t)(__HAL_TIM_GET_COUNTER((pid->htim)));
     __HAL_TIM_SET_COUNTER((pid->htim),0);
@@ -90,7 +90,7 @@ int32_t encoder_read(pid_parameter* pid)
 
 float pid_calculate(pid_parameter* pid, float dt)
 {
-    pid->encoder_value += encoder_read(pid);
+    pid->encoder_value += (int32_t)encoder_read(pid);
     // 最后有一个除2的修正,单位为mm
     pid->pos_curr = pid->encoder_value / pid->encoder_number_per_circle * pid->reduction_ratio * pid->Ph / 2;
     pid->err_curr = pid->pos_set - pid->pos_curr;

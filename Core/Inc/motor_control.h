@@ -10,7 +10,7 @@
 
 typedef struct {
     uint8_t motor_id;
-    int16_t encoder_value;
+    int32_t encoder_value;
     
     TIM_HandleTypeDef* htim;
     
@@ -33,7 +33,7 @@ typedef struct {
     float reduction_ratio;           // ¼õËÙ±È
 } pid_parameter;
 
-int32_t encoder_read(pid_parameter* pid);
+int16_t encoder_read(pid_parameter* pid);
 void motor_drive_instruct(uint8_t motor_id, int16_t pwm_value);
 void pid_parameter_init(pid_parameter* pid, uint8_t id, TIM_HandleTypeDef* htim);
 float pid_calculate(pid_parameter* pid, float dt);
